@@ -14,9 +14,9 @@ echo "
 \usepackage{amsmath,amssymb,amsfonts}
 \pagestyle{empty}
 \begin{document}
-    $$
+    \$\$
         $1
-    $$
+    \$\$
 \end{document}" > main.tex
 
 lualatex main.tex > /dev/null
