@@ -1,0 +1,29 @@
+#!/bin/bash
+
+tmp=$(mktemp -d)
+function rm_tmp {
+    [ -d "$tmp" ] && rm -rd "$tmp"
+}
+trap rm_tmp EXIT
+trap 'trap - EXIT; rm_tmpfile; exit -1' INT PIPE TERM
+
+cd $tmp
+
+echo > main.tex
+echo '\documentclass{article}' >> main.tex
+echo '\usepackage{amsmath,amssymb,amsfonts}' >> main.tex
+echo '\pagestyle{empty}' >> main.tex
+echo '\begin{document}' >> main.tex
+echo '    $$' >> main.tex
+echo          $1 >> main.tex
+echo '    $$' >> main.tex
+echo '\end{document}' >> main.tex
+
+lualatex main.tex > /dev/null
+pdfcrop main.pdf crop.pdf > /dev/null
+pdftoppm -png crop.pdf -scale-to-x -1 -scale-to-y 200 > main.png
+
+convert -negate main.png neg.png
+img2sixel neg.png
+
+cd - > /dev/null
